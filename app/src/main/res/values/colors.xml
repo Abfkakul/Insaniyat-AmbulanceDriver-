@@ -5,4 +5,8 @@
     <color name="colorAccent">#D81B60</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="darkblue">#000630</color>
+    <color name="darkpurple">#3c2f8a</color>
+    <color name="colorButtonTransparent">#be050505</color>
+    <color name="colorText">#dddddd</color>
 </resources>

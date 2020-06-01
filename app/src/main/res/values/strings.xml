@@ -11,4 +11,5 @@
     <string name="title_activity_sign_in">SignInActivity</string>
     <string name="login">Login</string>
     <string name="loginUser">Driver Login</string>
+    <string name="insaniyat">Ambulance Driver</string>
 </resources>
