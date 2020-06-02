@@ -14,9 +14,7 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
 
-        <TextView
-            style="@style/heading"
-            android:text="@string/signupUser" />
+
 
     </LinearLayout>
 
