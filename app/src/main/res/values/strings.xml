@@ -12,4 +12,8 @@
     <string name="login">Login</string>
     <string name="loginUser">Driver Login</string>
     <string name="insaniyat">Ambulance Driver</string>
+    <string name="access_token">pk.eyJ1IjoiYW5hc2ZhaXNhbCIsImEiOiJjazczYmJtMHkwN3g5M2xueDlxbG82ZTVvIn0.e-KxwYakh_da5eXKyiuuGA</string>
+    <string name="user_location_permission_explanation">Location required</string>
+    <string name="user_location_permission_not_granted">Location not granted</string>
+
 </resources>
