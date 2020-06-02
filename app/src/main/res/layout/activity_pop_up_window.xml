@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PopUpWindow"
+    android:background="@drawable/popupbg"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="75dp"
+            android:text="Ride Notification"
+            android:textColor="@color/black"
+            android:textSize="@dimen/Heading"/>
+
+
+    </RelativeLayout>
+
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.50">
+
+
+        <!--
+                    <TextView
+                        android:id="@+id/Text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Customer Name:"
+                        android:textColor="@color/black"
+                        android:layout_marginLeft="30dp"/>
+
+
+
+                    <TextView
+                        android:id="@+id/CusName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mr. xyz"
+                        android:textColor="@color/black"
+                        android:layout_alignBottom="@id/Text1"
+                        android:layout_marginLeft="120dp"
+                        />
+
+                <TextView
+                    android:id="@+id/Text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Area Name:"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="60dp"/>
+
+
+                <TextView
+                    android:id="@+id/Area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mr. xyz"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="120dp"
+                    android:layout_marginTop="60dp"
+                    />-->
+
+
+
+    </RelativeLayout>
+
+
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.15">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="14"
+            >
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="4"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept ride"
+                android:background="@color/StartColor"
+                android:textColor="@color/black"
+                android:layout_weight="6"
+                />
+
+            <!--    <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:visibility="invisible"/>-->
+
+            <!-- <Button
+                 android:id="@+id/reject"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Cancel"
+                 android:background="@color/StopColor"
+                 android:textColor="@color/black"
+                 android:layout_weight="4"/>
+     -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="4"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        />
+
+
+</LinearLayout>

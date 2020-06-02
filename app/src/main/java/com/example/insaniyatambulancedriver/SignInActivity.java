@@ -15,6 +15,9 @@ public class SignInActivity extends AppCompatActivity {
         Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
 
+        /*Intent j = new Intent(this, PopUpWindow.class);
+        startActivity(j);
+*/
     }
 
 }

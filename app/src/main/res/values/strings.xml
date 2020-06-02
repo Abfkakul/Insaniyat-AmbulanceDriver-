@@ -15,5 +15,6 @@
     <string name="access_token">pk.eyJ1IjoiYW5hc2ZhaXNhbCIsImEiOiJjazczYmJtMHkwN3g5M2xueDlxbG82ZTVvIn0.e-KxwYakh_da5eXKyiuuGA</string>
     <string name="user_location_permission_explanation">Location required</string>
     <string name="user_location_permission_not_granted">Location not granted</string>
+    <string name="title_activity_pop_up_window">PopUpWindow</string>
 
 </resources>
