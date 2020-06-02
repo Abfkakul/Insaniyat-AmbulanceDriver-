@@ -1,12 +1,20 @@
 package com.example.insaniyatambulancedriver;
 
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -31,6 +39,10 @@ public class LocationComponentActivity extends AppCompatActivity implements
     private MapboxMap mapboxMap;
     private MapView mapView;
 
+    private FirebaseAuth mFirebaseAuth;
+
+    public Boolean indicator = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +60,78 @@ public class LocationComponentActivity extends AppCompatActivity implements
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
+
+
+
+        //Toggle button starting the service of update location
+        ToggleButton toggle = findViewById(R.id.toggle);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+
+                    //logic for signout
+                    indicator = false;
+
+                    //FINDLOC();
+                    Log.d("Before service starts:","1");
+
+                    //Start service for update in driver`s location
+                    startService(new Intent(getBaseContext(), TheService.class));
+
+
+
+                } else {
+                    // The toggle is disabled
+
+                    //logic for signout
+                    indicator = true;
+
+                    Log.d("After service stops:","1");
+
+
+
+
+                    //end service
+                    stopService(new Intent(getBaseContext(), TheService.class));
+
+                }
+            }
+        });
+
+
+
+        //log out logic
+        Button LogOut = findViewById(R.id.LogOut);
+        LogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(indicator.equals(true)){
+                    signOut();
+                }
+                else{
+                    Toast.makeText(LocationComponentActivity.this, "First Go Offline", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
+
+    }
+
+    public void signOut(){
+        mFirebaseAuth.signOut();
+       openMain();
+    }
+
+    public void openMain(){
+        Intent i = new Intent(LocationComponentActivity.this, MainActivity.class);
+        startActivity(i);
     }
 
     @Override
@@ -155,5 +239,10 @@ public class LocationComponentActivity extends AppCompatActivity implements
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

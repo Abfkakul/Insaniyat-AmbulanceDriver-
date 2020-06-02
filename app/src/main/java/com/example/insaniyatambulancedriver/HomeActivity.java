@@ -5,9 +5,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 public class HomeActivity extends AppCompatActivity {
 
 
@@ -37,9 +34,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    public void session(){
 
-    }
 
 
 

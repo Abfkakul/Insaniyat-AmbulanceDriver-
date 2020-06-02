@@ -81,6 +81,7 @@ public class SignUpActivity extends AppCompatActivity
         String pwd = password.getText().toString();
         final User user = new User(naam,phone,email,pwd,latitude,longitutde);
 
+
         if(email.isEmpty() && pwd.isEmpty())
         {
             Toast.makeText(SignUpActivity.this,"Fields are empty",Toast.LENGTH_SHORT);
@@ -154,12 +155,15 @@ public class SignUpActivity extends AppCompatActivity
         startActivity(i);
     }
 
+
+
     @Override
     public void onBackPressed()
     {
         finish();
         startActivity(new Intent(SignUpActivity.this,MainActivity.class));
     }
+
 
     public void FINDLOC(){
 
