@@ -2,6 +2,8 @@ package com.example.insaniyatambulancedriver;
 
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,12 +13,31 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
@@ -26,8 +47,17 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
+import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 
 /**
  * Use the LocationComponent to easily add a device location "puck" to a Mapbox map.
@@ -41,7 +71,42 @@ public class LocationComponentActivity extends AppCompatActivity implements
 
     private FirebaseAuth mFirebaseAuth;
 
+
     public Boolean indicator = true;
+
+
+    //for storing document id
+    private String assignedDocID;
+
+
+    //for FINDLOC() which is not used
+    private FusedLocationProviderClient client;
+    double latitude;
+    double longitutde;
+
+    //new
+    private FirebaseFirestore mFireStore;
+    private ListenerRegistration noteListener;
+    //new end
+
+    //new location
+    public double driverlat;
+    public double driverLong;
+    public double userLat;
+    public double userLong;
+    //public String userName;
+    //public String UserPickUpArea;
+
+    //for reject notification
+    public DocumentChange obj= null;
+
+    //new navigation
+    // variables for calculating and drawing a route
+    private DirectionsRoute currentRoute;
+    private static final String TAG = "DirectionsActivity";
+    private NavigationMapRoute navigationMapRoute;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +128,10 @@ public class LocationComponentActivity extends AppCompatActivity implements
 
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
+        final FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        mFireStore =FirebaseFirestore.getInstance();
+
 
 
 
@@ -83,6 +152,9 @@ public class LocationComponentActivity extends AppCompatActivity implements
                     //Start service for update in driver`s location
                     startService(new Intent(getBaseContext(), TheService.class));
 
+                    //Listening to any update in the Assigned Driver Collection
+                    attachListener();
+
 
 
                 } else {
@@ -91,12 +163,95 @@ public class LocationComponentActivity extends AppCompatActivity implements
                     //logic for signout
                     indicator = true;
 
-                    Log.d("After service stops:","1");
+
+                    //Start of (End ride logic)
+
+                    //getting document id for assigned ride
+                    mFireStore.collection("AssignedRides")
+                            .whereEqualTo("AmbulanceDriverID", ""+mFirebaseUser.getEmail())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                            assignedDocID = document.getId();
+                                            //driverDocID = document.getData().get("AmbulanceDriverID").toString();
+
+                                            Log.d("Status","Fetched doc Id");
+                                            Log.d("Status",""+document.getId() + " => " + document.getData());
+
+                                        }
+
+                                        //querry 2
+                                        //deleting document after ride is ended
+                                        mFireStore.collection("AssignedRides").document(assignedDocID)
+                                                .delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("Status","Document deleted "+assignedDocID);
+                                                        Log.d("Status","DocumentSnapshot successfully deleted!");
+
+                                                        //querry 3
+                                                        // Set "Status" to "available" of ambulance driver when ride is ended
+                                                        DocumentReference washingtonRef = mFireStore.collection("Ambulance Drivers")
+                                                                .document(mFirebaseUser.getEmail());
+
+                                                        washingtonRef
+                                                                .update("status", "Available")
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        Log.d("Status:","Updated to Available");
+
+                                                                    }
+                                                                })
+                                                                .addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+
+                                                                        Log.d("status:","Error updating document to Available");
+
+                                                                    }
+                                                                });
+                                                        //end querry 3
+
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.d("Status","Document could not be deleted");
+                                                        Log.d("Status","Error deleting document"+e);
+                                                    }
+                                                });
+                                        //delete end
+                                        //querry 2 end
+
+
+
+                                    } else {
+                                        Log.d("Status","Could not fetched doc Id");
+                                        Log.d("Status","Error getting documents: "+task.getException());
+                                    }
+                                }
+                            });
+                    //end getting
+
+                    restartActivity();
+
+                    detachListener();
+                    //End of (End ride logic)
+
+
 
 
 
 
                     //end service
+                    Log.d("After service stops:","1");
                     stopService(new Intent(getBaseContext(), TheService.class));
 
                 }
@@ -123,6 +278,168 @@ public class LocationComponentActivity extends AppCompatActivity implements
 
 
     }
+    //here onCreate ends
+
+
+    //My Customize functions   ///////////////////////////////////////////
+    public void attachListener(){
+        final FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        noteListener= mFireStore.collection("AssignedRides")
+                .whereEqualTo("AmbulanceDriverID", ""+mFirebaseUser.getEmail())
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("Listening 1 :>", "listen:error", e);
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    obj=dc;
+                                    //Pop up notification for Ambulance Driver
+                                    openPopUpWindow();
+
+                                    //Storing useful info for map navigation and notification pop-up
+                                    driverlat= new Double( dc.getDocument().getData().get("D_Latitude").toString());
+                                    driverLong= new Double( dc.getDocument().getData().get("D_Longitude").toString());
+                                    userLat = new Double(dc.getDocument().getData().get("U_Latitude").toString());
+                                    userLong = new Double(dc.getDocument().getData().get("U_Longitude").toString());
+                                    Log.d("Data added:>", "New Driver: " + dc.getDocument().getData());
+                                    //Toast.makeText(LocationComponentActivity.this, ""+dc.getDocument().getData(), Toast.LENGTH_LONG).show();
+
+                                    //Start navigation for driver
+                                    StartNavigation();
+                                    break;
+
+                                        /*case MODIFIED:
+                                            Log.d("Data modified", "is  : " + dc.getDocument().getData());
+                                            break;*/
+
+                                case REMOVED:
+                                    restartActivity();
+                                    Log.d("Data removed", "Driver Removed is : " + dc.getDocument().getData());
+                                    break;
+                            }
+                        }
+
+
+
+
+                    }
+                });
+    }
+
+    public void detachListener(){
+        noteListener.remove();
+        Log.d("Listener: ","Removed");
+        //Toast.makeText(LocationComponentActivity.this, "Remove Listener", Toast.LENGTH_SHORT).show();
+    }
+
+
+
+    public void StartNavigation(){
+
+        Point origin = Point.fromLngLat(driverLong,driverlat);
+        Point destination = Point.fromLngLat(userLong,userLat);
+        Log.d("Driver coord:",""+origin);
+        Log.d("User coord:",""+destination);
+        getRoute(origin, destination);
+        Toast.makeText(this, "Navigation about to start", Toast.LENGTH_SHORT).show();
+
+    }
+
+
+
+    void getRoute(Point origin, Point destination) {
+        NavigationRoute.builder(this)
+                .accessToken(Mapbox.getAccessToken())
+                .origin(origin)
+                .destination(destination)
+                .build()
+                .getRoute(new Callback<DirectionsResponse>() {
+                    @Override
+                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                        // You can get the generic HTTP info about the response
+                        Log.d(TAG, "Response code: " + response.code());
+                        if (response.body() == null) {
+                            Log.e(TAG, "No routes found, make sure you set the right user and access token.");
+                            return;
+                        } else if (response.body().routes().size() < 1) {
+                            Log.e(TAG, "No routes found");
+                            return;
+                        }
+
+                        currentRoute = response.body().routes().get(0);
+
+                        //for debugging
+                        Log.d("Route",""+currentRoute);
+
+
+                        // Draw the route on the map
+                        if (navigationMapRoute != null) {
+                            navigationMapRoute.removeRoute();
+                            //Toast.makeText(LocationComponentActivity.this, "yoyooyo", Toast.LENGTH_SHORT).show();
+                        } else {
+                            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap, R.style.NavigationMapRoute);
+                        }
+                        navigationMapRoute.addRoute(currentRoute);
+                    }
+
+                    @Override
+                    public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                        Log.e(TAG, "Error: " + throwable.getMessage());
+                    }
+                });
+
+    }
+
+    public void FINDLOC(){
+
+        if(ActivityCompat.checkSelfPermission(LocationComponentActivity.this , ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+
+        client = LocationServices.getFusedLocationProviderClient(LocationComponentActivity.this);
+        client.getLastLocation().addOnSuccessListener(LocationComponentActivity.this ,new OnSuccessListener<Location>() {
+
+            @Override
+            public void onSuccess(Location location) {
+                if(location!=null){
+                    longitutde = location.getLongitude();
+                    latitude = location.getLatitude();
+                    Log.d("MyLatitude:::::>",""+latitude);
+                    Log.d("MyLongitude:::::>",""+longitutde);
+                    Toast.makeText(LocationComponentActivity.this, "Show Location "+latitude+" "+longitutde, Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(LocationComponentActivity.this, "Turn on GPS Or some other issue"+location, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(LocationComponentActivity.this, "Location not retrieved, ERROR!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void openPopUpWindow(){
+        Intent i = new Intent(this, PopUpWindow.class);
+        startActivity(i);
+    }
+
+    public void restartActivity(){
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+
 
     public void signOut(){
         mFirebaseAuth.signOut();
@@ -133,6 +450,9 @@ public class LocationComponentActivity extends AppCompatActivity implements
         Intent i = new Intent(LocationComponentActivity.this, MainActivity.class);
         startActivity(i);
     }
+
+
+    //My Customize functions ends    //////////////////////////////////////////////
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -243,6 +563,6 @@ public class LocationComponentActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-
+        Toast.makeText(LocationComponentActivity.this, "You need to stay on this page", Toast.LENGTH_SHORT).show();
     }
 }

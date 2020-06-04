@@ -181,7 +181,7 @@ public class SignUpActivity extends AppCompatActivity
                     latitude = location.getLatitude();
                     Log.d("MyLatitude:::::>",""+latitude);
                     Log.d("MyLongitude:::::>",""+longitutde);
-                    Toast.makeText(SignUpActivity.this, "Show Location "+latitude+" "+longitutde, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SignUpActivity.this, "Show Location "+latitude+" "+longitutde, Toast.LENGTH_SHORT).show();
                 }
                 else{
                     Toast.makeText(SignUpActivity.this, "Turn on GPS Or some other issue"+location, Toast.LENGTH_SHORT).show();

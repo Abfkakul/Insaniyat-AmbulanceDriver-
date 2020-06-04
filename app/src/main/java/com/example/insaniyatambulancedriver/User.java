@@ -3,7 +3,7 @@ package com.example.insaniyatambulancedriver;
 
 public class User
 {
-    public String email,password,name,phoneNumber,role;
+    public String email,password,name,phoneNumber,role,status;
 
     public Double latitude,longitude;
 
@@ -23,6 +23,7 @@ public class User
         this.role="Ambulance Driver";
         this.latitude = latitude;
         this.longitude = longitude;
+        this.status="Available";
     }
 
     public String getEmail()

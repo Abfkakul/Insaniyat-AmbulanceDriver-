@@ -52,7 +52,6 @@ public class TheService extends Service   {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show();
         Log.d("After service starts:","2");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new MyLocationListener();
@@ -82,7 +81,6 @@ public class TheService extends Service   {
         // handler.removeCallbacks(sendUpdatesToUI);
         super.onDestroy();
         Log.d("before service stops:","2");
-        Toast.makeText(this, "Service stopped", Toast.LENGTH_SHORT).show();
         locationManager.removeUpdates(listener);
     }
 
@@ -131,7 +129,7 @@ public class TheService extends Service   {
                     });
 
             Log.d("Update service","Data added to Firecloud");
-            Toast.makeText(TheService.this, "Data added to Firecloud", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(TheService.this, "Data added to Firecloud", Toast.LENGTH_SHORT).show();
             //end
 
         }
@@ -147,7 +145,7 @@ public class TheService extends Service   {
             Log.d("GPS:","Disabled");
             //Toast.makeText(TheService.this, "GPS Disabled", Toast.LENGTH_SHORT).show();
             Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
-            Toast.makeText(TheService.this, "", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(TheService.this, "", Toast.LENGTH_SHORT).show();
         }
 
 
