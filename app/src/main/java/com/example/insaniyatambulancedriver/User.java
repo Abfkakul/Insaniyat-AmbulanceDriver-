@@ -23,7 +23,7 @@ public class User
         this.role="Ambulance Driver";
         this.latitude = latitude;
         this.longitude = longitude;
-        this.status="Available";
+        this.status="Unvailable";
     }
 
     public String getEmail()
