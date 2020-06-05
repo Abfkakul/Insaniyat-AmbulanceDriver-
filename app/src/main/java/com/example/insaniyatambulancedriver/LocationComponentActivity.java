@@ -196,29 +196,7 @@ public class LocationComponentActivity extends AppCompatActivity implements
                                                             Log.d("Status","Document deleted "+assignedDocID);
                                                             Log.d("Status","DocumentSnapshot successfully deleted!");
 
-                                                            /*//querry 3
-                                                            // Set "Status" to "Unavailable" of ambulance driver when goes offline
-                                                            DocumentReference washingtonRef = mFireStore.collection("Ambulance Drivers")
-                                                                    .document(mFirebaseUser.getEmail());
 
-                                                            washingtonRef
-                                                                    .update("status", "Unavailable")
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            Log.d("Press Go Offline:","Updated to Unvailable");
-
-                                                                        }
-                                                                    })
-                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-
-                                                                            Log.d("status:","Error updating document to Unvailable");
-
-                                                                        }
-                                                                    });
-                                                            //end querry 3*/
 
                                                         }
                                                     })
@@ -272,79 +250,7 @@ public class LocationComponentActivity extends AppCompatActivity implements
 
 
                     }
-                   /* //getting document id for assigned ride
-                    mFireStore.collection("AssignedRides")
-                            .whereEqualTo("AmbulanceDriverID", ""+mFirebaseUser.getEmail())
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                            assignedDocID = document.getId();
-                                            //driverDocID = document.getData().get("AmbulanceDriverID").toString();
-
-                                            Log.d("Status","Fetched doc Id");
-                                            Log.d("Status",""+document.getId() + " => " + document.getData());
-
-                                        }
-
-                                        //querry 2
-                                        //deleting document after ride is ended
-                                        mFireStore.collection("AssignedRides").document(assignedDocID)
-                                                .delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d("Status","Document deleted "+assignedDocID);
-                                                        Log.d("Status","DocumentSnapshot successfully deleted!");
-
-                                                        //querry 3
-                                                        // Set "Status" to "Unavailable" of ambulance driver when goes offline
-                                                        DocumentReference washingtonRef = mFireStore.collection("Ambulance Drivers")
-                                                                .document(mFirebaseUser.getEmail());
-
-                                                        washingtonRef
-                                                                .update("status", "Unavailable")
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        Log.d("Press Go Offline:","Updated to Unvailable");
-
-                                                                    }
-                                                                })
-                                                                .addOnFailureListener(new OnFailureListener() {
-                                                                    @Override
-                                                                    public void onFailure(@NonNull Exception e) {
-
-                                                                        Log.d("status:","Error updating document to Unvailable");
-
-                                                                    }
-                                                                });
-                                                        //end querry 3
-
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.d("Status","Document could not be deleted");
-                                                        Log.d("Status","Error deleting document"+e);
-                                                    }
-                                                });
-                                        //delete end
-                                        //querry 2 end
-
-
-
-                                    } else {
-                                        Log.d("Status","Could not fetched doc Id");
-                                        Log.d("Status","Error getting documents: "+task.getException());
-                                    }
-                                }
-                            });
-                    //end getting*/
 
                     restartActivity();
 
@@ -372,27 +278,6 @@ public class LocationComponentActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 if(indicator.equals(true)){
-                    //Set Driver status to "Unavailable"
-                    /*DocumentReference washingtonRef = mFireStore.collection("Ambulance Drivers")
-                            .document(mFirebaseUser.getEmail());
-
-                    washingtonRef
-                            .update("status", "Unavailable")
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d("logout Button pressed :","Updated to Unavailable");
-
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                    Log.d("status:","Error updating document to Unavailable");
-
-                                }
-                            });*/
 
                     signOut();
                 }
